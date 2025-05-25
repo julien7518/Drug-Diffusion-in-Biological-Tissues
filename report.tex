@@ -2,34 +2,169 @@
 \usepackage[margin=2cm]{geometry}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
 \title{Drug Diffusion in Biological Tissues: Mathematical Analysis and Numerical Simulation}
 \author{Julien Fernandes}
 \date{26 May 2025}
 \begin{document}
 
 \maketitle
+\hypersetup{linktoc=all}
 \tableofcontents
 \newpage
 
 \section{Introduction}
-Présentation du problème étudié, motivation biomédicale, objectifs du rapport.
+Drug delivery is a fundamental process in medicine, especially when it comes to treating diseases in specific tissues.
+When a drug is administered, it often needs to spread through biological tissues to reach the targeted area.
+Understanding how drugs move and spread inside tissues is important for improving treatments, avoiding side effects, and designing better drug delivery systems.
+This report focuses on the mathematical modeling of drug diffusion in biological tissues. We will explore a well-known partial differential equation called the diffusion equation, analyze it theoretically, and solve it using numerical methods.
+Our goal is to understand how this equation helps us describe the movement of drugs in 2D tissues and to simulate this process using Python.
 
 \section{Literature Review and Context}
+
 \subsection{Origin of the Diffusion Equation}
+The diffusion equation is a type of partial differential equation (PDE) that describes how a quantity such as heat, particles, or drugs spreads over time.
+It was first studied in detail by Joseph Fourier in the early 19th century in the context of heat transfer.
+Fourier introduced the concept of using mathematical equations to describe how heat moves through solid bodies.
+Later, Adolf Fick applied similar ideas to the movement of particles in liquids and gases. Fick’s laws of diffusion, published in 1855, are still used today to describe molecular diffusion in biological systems.
+
+The standard form of the diffusion equation in two dimensions is:
+\[
+\frac{\partial u}{\partial t} = D \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right)
+\]
+where \( u(x, y, t) \) is the concentration of the substance at position \((x, y)\) and time \(t\), and \(D\) is the diffusion coefficient. This equation can be extended to include anisotropy and reaction terms to better model complex situations in biology.
+
 \subsection{Biomedical Applications}
+In medicine and biology, diffusion is important for understanding how substances like oxygen, nutrients, and drugs move through tissues.
+For example, when a drug is injected or delivered through the skin, it must diffuse through layers of tissue to reach its target.
+This process is influenced by the properties of the tissue, such as density, porosity, and anisotropy (when diffusion is faster in one direction than another).
+
+Drug diffusion models are used in pharmacokinetics to study how drugs move in the body, how long they stay active, and where they accumulate.
+These models help in the design of drug delivery systems like transdermal patches, implants, or controlled-release capsules.
+They are also important in cancer therapy, where accurate diffusion models can help predict how chemotherapy drugs spread in tumor tissues.
+
 \subsection{Key Works and References}
+Many studies have contributed to the mathematical modeling of drug diffusion.
+One of the classic references is J. Crank’s book “The Mathematics of Diffusion” (1975), which gives a detailed explanation of diffusion theory and solution methods.
+Another important book is “Mathematical Physiology” by Keener and Sneyd (1998), which covers the application of PDEs to biological problems.
+
+In recent years, researchers have used numerical simulations and imaging techniques to improve our understanding of diffusion in tissues.
+For example, diffusion tensor imaging (DTI) allows scientists to measure anisotropic diffusion in the brain and other organs. Studies like those by T. L. Jackson et al. (2009) discuss how mathematical models can help simulate drug transport in tumors.
+Articles from journals like the Journal of Controlled Release, Journal of Theoretical Biology, and Mathematical Biosciences provide many modern examples of PDE models in biomedical applications.
+
+For readers who want to learn more, we recommend the following sources:
+\begin{itemize}
+  \item Crank, J. \textit{The Mathematics of Diffusion}
+  \item Keener, J., Sneyd, J. \textit{Mathematical Physiology}
+  \item Jackson, T. L. et al. \textit{Mathematical models of drug transport in tumors}
+  \item Articles from the Journal of Controlled Release
+  \item Reviews on drug delivery modeling in Nature Reviews Drug Discovery
+  \item Online academic resources such as ScienceDirect, SpringerLink, and PubMed
+\end{itemize}
 
 \section{Theoretical Exploration}
+
 \subsection{Equation Classification}
+The diffusion equation used in this project is a second-order partial differential equation (PDE) that is classified as a parabolic equation. Parabolic PDEs describe processes that involve time evolution with smoothing or spreading behavior, such as heat conduction or chemical diffusion. In our case, the diffusion equation models the change in drug concentration over time in a 2D spatial domain.
+
+Parabolic equations typically have one time derivative and second-order spatial derivatives. They are known to generate solutions that are continuous and smooth as time increases, even if the initial conditions are not. This makes them suitable for modeling physical processes where the substance gradually spreads out.
+
 \subsection{Mathematical Structure}
+The general 2D diffusion equation without reaction terms is:
+\[
+\frac{\partial u}{\partial t} = D_x \frac{\partial^2 u}{\partial x^2} + D_y \frac{\partial^2 u}{\partial y^2}
+\]
+where:
+\begin{itemize}
+    \item \( u(x, y, t) \) is the drug concentration at time \(t\),
+    \item \( D_x \) and \( D_y \) are the diffusion coefficients in the \(x\) and \(y\) directions.
+\end{itemize}
+
+When \( D_x \neq D_y \), the diffusion is anisotropic, meaning the drug spreads at different speeds depending on direction. This is common in biological tissues where fibers or structures can guide the movement of molecules.
+
+If we add a reaction term to model absorption or decay of the drug, we get:
+\[
+\frac{\partial u}{\partial t} = D_x \frac{\partial^2 u}{\partial x^2} + D_y \frac{\partial^2 u}{\partial y^2} - \lambda u
+\]
+where \( \lambda \) is the reaction rate (e.g., drug being absorbed or metabolized).
+
+The diffusion equation is linear, which means we can use superposition to build more complex solutions. It also satisfies conservation of mass in the absence of sources or sinks.
+
 \subsection{Simplified Analytical Solution}
+To better understand the behavior of the diffusion equation, we solve a simplified version analytically. We assume:
+\begin{itemize}
+    \item Isotropic diffusion: \( D_x = D_y = D \)
+    \item No reaction: \( \lambda = 0 \)
+    \item Infinite domain in 2D
+    \item Initial condition: a point source at the origin, modeled by a Dirac delta function
+\end{itemize}
+
+The solution in this case is known as the fundamental solution of the 2D diffusion equation:
+\[
+u(x, y, t) = \frac{1}{4\pi D t} \exp\left( -\frac{x^2 + y^2}{4Dt} \right)
+\]
+
+This function is a 2D Gaussian that spreads over time. The peak of the function decreases while the width increases, meaning the drug concentration becomes more spread out and less concentrated at the center.
+
 \subsection{Physical Interpretation of the Solution}
+The analytical solution shows that the drug starts at a single point and spreads out evenly in all directions. The total amount of drug remains constant over time (mass conservation), but the concentration at each point decreases as it spreads.
+
+In real tissues, the diffusion may not be symmetric due to structural anisotropy. In such cases, the solution becomes elongated in the direction where diffusion is faster. Also, if the drug is absorbed or metabolized, the concentration decreases faster over time.
+
+Understanding this behavior helps us predict how far and how fast a drug will spread from the injection point. It also helps in estimating how long it will take for the drug to reach a therapeutic concentration at the target location.
 
 \section{Numerical Implementation}
+
 \subsection{Choice of Numerical Method}
+To simulate the diffusion of a drug in biological tissue, we use the \textbf{finite difference method} (FDM). This method is simple to implement and gives good results for solving partial differential equations. It replaces derivatives with approximations based on values at grid points in space and time.
+
+We apply this method to the 2D diffusion-reaction equation. The time derivative is solved using the \textbf{Forward Euler method}, which is an explicit time-stepping scheme. Even though this method is conditionally stable, it is easy to code and works well with small time steps.
+
+This approach lets us simulate both \textbf{isotropic} diffusion (same rate in all directions) and \textbf{anisotropic} diffusion (different rates in different directions). We can also include a \textbf{reaction term} to simulate how the drug is absorbed or breaks down inside the tissue.
+
 \subsection{Description of the Numerical Scheme}
+We define a square simulation domain divided into a grid of \( N \times N \) points. Let \( \Delta x \) and \( \Delta y \) be the spatial steps (usually the same), and \( \Delta t \) be the time step.
+
+Let \( u_{i,j}^n \) be the approximation of the drug concentration \( u(x, y, t) \) at grid point \( (i,j) \) and time step \( n \). The finite difference update rule for the diffusion equation with anisotropic diffusion and a linear reaction is:
+
+\[
+u_{i,j}^{n+1} = u_{i,j}^n + \Delta t \left[ D_x \frac{u_{i+1,j}^n - 2u_{i,j}^n + u_{i-1,j}^n}{\Delta x^2} + D_y \frac{u_{i,j+1}^n - 2u_{i,j}^n + u_{i,j-1}^n}{\Delta y^2} - \lambda u_{i,j}^n \right]
+\]
+
+We use \textbf{homogeneous Neumann boundary conditions}, meaning the gradient of \( u \) at the edges is zero. This condition represents a tissue where the drug cannot escape the domain.
+
+The \textbf{initial condition} is a 2D Gaussian centered in the grid, simulating a local injection of the drug.
+
 \subsection{Stability and Convergence Analysis}
+Since we use the \textbf{explicit Forward Euler method}, stability is a key concern. The method is stable only if the time step \( \Delta t \) satisfies the \textbf{Courant–Friedrichs–Lewy (CFL)} condition:
+
+\[
+\Delta t \leq \frac{1}{2} \left( \frac{1}{D_x / \Delta x^2 + D_y / \Delta y^2} \right)
+\]
+
+If this condition is not respected, the solution may diverge or show unphysical oscillations.
+
+To check convergence, we can repeat the simulation with smaller time and space steps and compare the results. If the method is converging, the numerical error should decrease as we refine the grid. In practice, we measure the difference between successive solutions and verify that the error decreases as expected.
+
 \subsection{Test Case Simulation}
+We test the numerical scheme on a 2D domain of size 1 cm × 1 cm, discretized into a 100 × 100 grid. The initial drug concentration is defined by:
+
+\[
+u(x, y, 0) = \exp\left( -\frac{(x - 0.5)^2 + (y - 0.5)^2}{2\sigma^2} \right)
+\]
+
+with \( \sigma = 0.05 \), creating a Gaussian peak at the center of the domain.
+
+We perform simulations with:
+\begin{itemize}
+    \item \( D_x = D_y = 0.01 \) cm\(^2\)/s (isotropic case),
+    \item \( D_x = 0.01 \), \( D_y = 0.001 \) (anisotropic case),
+    \item with and without a reaction rate \( \lambda = 0.1 \).
+\end{itemize}
+
+The simulation runs for a total time of 1 second, with a time step satisfying the stability condition. At each step, we save the solution to observe the drug spreading.
+
+In the next section, we present heatmaps and line plots showing the differences between isotropic and anisotropic diffusion, as well as the effect of the reaction term.
 
 \section{Results and Visualizations}
 \subsection{Isotropic vs Anisotropic Diffusion Comparison}
@@ -40,7 +175,6 @@ Présentation du problème étudié, motivation biomédicale, objectifs du rappo
 \subsection{Summary of Results}
 \subsection{Limitations and Future Improvements}
 
-\section*{References}
 \begin{thebibliography}{9}
 \bibitem{crank} J. Crank, \textit{The Mathematics of Diffusion}, Oxford University Press, 1975.
 \bibitem{keener} J. Keener and J. Sneyd, \textit{Mathematical Physiology}, Springer, 1998.
