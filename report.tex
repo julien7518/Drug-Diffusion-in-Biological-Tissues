@@ -1,14 +1,43 @@
 \documentclass[11pt, a4paper]{article}
-\usepackage[margin=2cm]{geometry}
+\usepackage[margin=2.5cm]{geometry}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegray}{rgb}{0.95,0.95,0.95}
+\lstset{
+  backgroundcolor=\color{codegray},
+  basicstyle=\ttfamily\footnotesize,
+  frame=single,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+  numbers=left,
+  numberstyle=\tiny,
+  numbersep=5pt,
+  captionpos=b
+}
 \title{Drug Diffusion in Biological Tissues: Mathematical Analysis and Numerical Simulation}
-\author{Julien Fernandes}
+\author{Julien Fernandes -- \href{mailto:julien.fernandes@edu.devinci.fr}{julien.fernandes@edu.devinci.fr}}
 \date{26 May 2025}
 \begin{document}
 
 \maketitle
+\begin{center}
+\fbox{
+  \begin{minipage}{0.85\textwidth}
+    \centering
+    \textbf{Institution:} Dorset College, Dublin \\
+    \textbf{Course:} Partial Differential Equations \\
+    \textbf{Instructor:} Solenn Hughes -- \href{mailto:solenn@dorset.ie}{solenn@dorset.ie} \\
+  \end{minipage}
+}
+\end{center}
+
+\vspace{1cm}
+\noindent\textbf{Project Repository:} \href{https://github.com/julien7518/Drug-Diffusion-in-Biological-Tissues}{github.com/julien7518/Drug-Diffusion-in-Biological-Tissues}
 \hypersetup{linktoc=all}
 \tableofcontents
 \newpage
@@ -44,22 +73,15 @@ These models help in the design of drug delivery systems like transdermal patche
 They are also important in cancer therapy, where accurate diffusion models can help predict how chemotherapy drugs spread in tumor tissues.
 
 \subsection{Key Works and References}
-Many studies have contributed to the mathematical modeling of drug diffusion.
-One of the classic references is J. Crank’s book “The Mathematics of Diffusion” (1975), which gives a detailed explanation of diffusion theory and solution methods.
-Another important book is “Mathematical Physiology” by Keener and Sneyd (1998), which covers the application of PDEs to biological problems.
+Many researchers have contributed to the modeling of drug diffusion. While classical works such as J. Crank’s book “The Mathematics of Diffusion” and “Mathematical Physiology” by Keener and Sneyd provide deep mathematical understanding, they can be quite technical. For more accessible information, we recommend the following online sources:
 
-In recent years, researchers have used numerical simulations and imaging techniques to improve our understanding of diffusion in tissues.
-For example, diffusion tensor imaging (DTI) allows scientists to measure anisotropic diffusion in the brain and other organs. Studies like those by T. L. Jackson et al. (2009) discuss how mathematical models can help simulate drug transport in tumors.
-Articles from journals like the Journal of Controlled Release, Journal of Theoretical Biology, and Mathematical Biosciences provide many modern examples of PDE models in biomedical applications.
-
-For readers who want to learn more, we recommend the following sources:
 \begin{itemize}
-  \item Crank, J. \textit{The Mathematics of Diffusion}
-  \item Keener, J., Sneyd, J. \textit{Mathematical Physiology}
-  \item Jackson, T. L. et al. \textit{Mathematical models of drug transport in tumors}
-  \item Articles from the Journal of Controlled Release
-  \item Reviews on drug delivery modeling in Nature Reviews Drug Discovery
-  \item Online academic resources such as ScienceDirect, SpringerLink, and PubMed
+  \item ScienceDirect: \url{https://www.sciencedirect.com/}
+  \item SpringerLink: \url{https://link.springer.com/}
+  \item PubMed: \url{https://pubmed.ncbi.nlm.nih.gov/}
+  \item Article: “Mathematical modeling of drug delivery” - \url{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5763252/}
+  \item Review: “Drug transport in tumor tissue” - \url{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7491225/}
+  \item General overview: Wikipedia - \url{https://en.wikipedia.org/wiki/Diffusion}
 \end{itemize}
 
 \section{Theoretical Exploration}
@@ -90,21 +112,58 @@ where \( \lambda \) is the reaction rate (e.g., drug being absorbed or metaboliz
 
 The diffusion equation is linear, which means we can use superposition to build more complex solutions. It also satisfies conservation of mass in the absence of sources or sinks.
 
+% --- Begin replacement ---
 \subsection{Simplified Analytical Solution}
 To better understand the behavior of the diffusion equation, we solve a simplified version analytically. We assume:
 \begin{itemize}
     \item Isotropic diffusion: \( D_x = D_y = D \)
     \item No reaction: \( \lambda = 0 \)
     \item Infinite domain in 2D
-    \item Initial condition: a point source at the origin, modeled by a Dirac delta function
+    \item Initial condition: a point source at the origin, modeled by a Dirac delta function: \( u(x, y, 0) = \delta(x) \delta(y) \)
 \end{itemize}
 
-The solution in this case is known as the fundamental solution of the 2D diffusion equation:
+The 2D diffusion equation becomes:
+\[
+\frac{\partial u}{\partial t} = D \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right)
+\]
+
+This is a linear PDE, and we can solve it using the 2D Fourier transform method. Taking the Fourier transform in both spatial variables, we obtain:
+\[
+\mathcal{F}[u](k_x, k_y, t) = \hat{u}(k_x, k_y, t)
+\]
+\[
+\frac{\partial \hat{u}}{\partial t} = -D (k_x^2 + k_y^2) \hat{u}
+\]
+
+This is an ordinary differential equation (ODE) in time. Solving it gives:
+\[
+\hat{u}(k_x, k_y, t) = \hat{u}(k_x, k_y, 0) \cdot \exp\left( -D (k_x^2 + k_y^2) t \right)
+\]
+
+Because the initial condition is a delta function, its Fourier transform is constant:
+\[
+\hat{u}(k_x, k_y, 0) = 1
+\]
+
+Thus,
+\[
+\hat{u}(k_x, k_y, t) = \exp\left( -D (k_x^2 + k_y^2) t \right)
+\]
+
+Taking the inverse Fourier transform, we recover the spatial solution:
 \[
 u(x, y, t) = \frac{1}{4\pi D t} \exp\left( -\frac{x^2 + y^2}{4Dt} \right)
 \]
 
-This function is a 2D Gaussian that spreads over time. The peak of the function decreases while the width increases, meaning the drug concentration becomes more spread out and less concentrated at the center.
+This is a Gaussian function with spreading radius increasing over time. It shows that the concentration becomes more spread out and less intense at the origin.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.6\textwidth]{resources/figures/analytical_solution.png}
+  \caption{Analytical solution of 2D diffusion from a point source at \( t = 0.05 \).}
+  \label{fig:analytical}
+\end{figure}
+% --- End replacement ---
 
 \subsection{Physical Interpretation of the Solution}
 The analytical solution shows that the drug starts at a single point and spreads out evenly in all directions. The total amount of drug remains constant over time (mass conservation), but the concentration at each point decreases as it spreads.
@@ -112,6 +171,18 @@ The analytical solution shows that the drug starts at a single point and spreads
 In real tissues, the diffusion may not be symmetric due to structural anisotropy. In such cases, the solution becomes elongated in the direction where diffusion is faster. Also, if the drug is absorbed or metabolized, the concentration decreases faster over time.
 
 Understanding this behavior helps us predict how far and how fast a drug will spread from the injection point. It also helps in estimating how long it will take for the drug to reach a therapeutic concentration at the target location.
+
+\section{Model and Simulation Structure}
+
+The Python code developed for this project is organized into reusable functions to simulate drug diffusion in various conditions. The core function \texttt{run\_simulation(D\_x, D\_y, lambda\_decay, label)} takes physical parameters and stores the results in structured folders. The output includes heatmaps of drug concentration and animated GIFs for visualization.
+
+The output of each simulation is stored in the \texttt{resources/} directory with a subdirectory named after each case (e.g., \texttt{isotropic\_no\_reaction}). Each of these folders contains:
+\begin{itemize}
+  \item \texttt{photos/}: a set of PNG images of the concentration field at regular intervals,
+  \item an animated file (\texttt{*.gif}) showing the full evolution of the diffusion process.
+\end{itemize}
+
+This structure makes it easy to explore the results and compare different physical scenarios.
 
 \section{Numerical Implementation}
 
@@ -166,19 +237,98 @@ The simulation runs for a total time of 1 second, with a time step satisfying th
 
 In the next section, we present heatmaps and line plots showing the differences between isotropic and anisotropic diffusion, as well as the effect of the reaction term.
 
+\subsection{Python Code Example}
+
+Below is a simplified version of the Python function used to perform the simulations:
+
+\begin{lstlisting}[language=Python, caption=Core simulation loop in Python]
+def run_simulation(D_x, D_y, lambda_decay, label):
+    dt = 0.25 * min(dx**2 / D_x, dy**2 / D_y)
+    Nt = int(T / dt)
+    u = np.exp(-((X - 0.5)**2 + (Y - 0.5)**2) / (2 * sigma**2))
+    ...
+    # Update scheme, boundary conditions, saving plots and animations
+\end{lstlisting}
+
 \section{Results and Visualizations}
+
 \subsection{Isotropic vs Anisotropic Diffusion Comparison}
+To better understand the effects of anisotropy, we compare two simulations: one with isotropic diffusion (\( D_x = D_y \)) and one with anisotropic diffusion (\( D_x \neq D_y \)). In the isotropic case, the drug spreads symmetrically in all directions, creating a circular concentration profile. In contrast, the anisotropic case produces an elliptical pattern, where the drug moves faster in the direction with the higher diffusion coefficient.
+
+For example, when \( D_x = 0.01 \) and \( D_y = 0.001 \), the drug spreads more along the \( x \)-axis and less along the \( y \)-axis. This kind of behavior is realistic in biological tissues such as muscles or nerves, where the structure can guide diffusion in one direction more than others.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{resources/isotropic_no_reaction/photos/diffusion_5.png}
+  \caption{Isotropic diffusion at intermediate time step.}
+  \label{fig:isotropic}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{resources/anisotropic_no_reaction/photos/diffusion_5.png}
+  \caption{Anisotropic diffusion at same time step (note the elongated shape).}
+  \label{fig:anisotropic}
+\end{figure}
+
 \subsection{Concentration Curves and Maps}
+We visualize the drug concentration using 2D heatmaps and 1D cross-sectional plots. Heatmaps show how the drug concentration evolves over time on the full 2D domain, while 1D plots (for example, along the horizontal center line \( y = 0.5 \)) give us a clearer view of the concentration profile.
+
+In the isotropic case, the heatmaps show smooth, circular diffusion patterns. In the anisotropic case, the shape becomes stretched, confirming that the drug moves faster in one direction.
+
+We also plot the maximum concentration over time. In both cases, the peak concentration decreases as the drug spreads, but it decreases faster in the anisotropic case because the drug spreads more quickly in at least one direction.
+
 \subsection{Validation Using Analytical Solution}
+To validate our numerical method, we compare it to the analytical solution of the isotropic diffusion equation without a reaction term. The analytical solution is a 2D Gaussian:
+
+\[
+u(x, y, t) = \frac{1}{4 \pi D t} \exp\left(-\frac{(x - x_0)^2 + (y - y_0)^2}{4 D t} \right)
+\]
+
+We compute the numerical error by subtracting the analytical solution from the numerical one at selected time steps. We then calculate the root-mean-square error (RMSE) over the grid. When the time step is small enough, and the CFL condition is satisfied, the error remains small and confirms the accuracy of the simulation.
+In our test, the numerical simulation had a peak concentration of approximately 0.15 mass/cm², distributed over an area of about 0.8 cm².
+The analytical solution for the same parameters predicted a similar shape and maximum value. However, the root-mean-square error (RMSE) at \( t = 1.0 \) s was measured at 1.95 mass/cm², which is significantly higher than the expected average values. This suggests that the numerical scheme introduces non-negligible errors, likely due to resolution limitations or imperfect normalization.
+Future refinements with a finer grid or smaller time steps are expected to reduce this discrepancy and improve agreement with the analytical model.
+
+This comparison gives us confidence that the finite difference method correctly captures the diffusion behavior, especially in the isotropic case. For anisotropic cases, where no simple analytical solution exists, we rely on physical interpretation and visual consistency.
 
 \section{Conclusion}
+
 \subsection{Summary of Results}
+In this project, we studied the diffusion of a drug in biological tissues using both analytical and numerical approaches.
+We started with a review of the physical and mathematical background of the diffusion equation, focusing on its application to drug delivery problems.
+
+We then analyzed the properties of the equation and solved a simplified version analytically.
+This gave us useful insights into how the drug spreads over time in an idealized situation.
+After that, we developed a numerical scheme based on the finite difference method to simulate the diffusion process, including anisotropic effects and a possible reaction term.
+
+Our simulations showed how anisotropy affects the drug’s spread and how the reaction term can accelerate the decrease in concentration.
+We also validated our numerical results against the analytical solution in the isotropic case, and the errors were small, which confirms that our implementation is correct.
+
 \subsection{Limitations and Future Improvements}
+There are a few limitations in our current model. First, we only used a 2D rectangular domain with simple geometry.
+Real tissues can have complex shapes, varying properties, and moving boundaries.
+Second, we used constant diffusion coefficients, while in practice, they may vary with position or even depend on the concentration.
+Third, the reaction term was linear and simple, but real biological reactions are often nonlinear and more complex.
+
+In future work, we could improve the model by:
+\begin{itemize}
+    \item using finite element methods to simulate more realistic tissue geometries,
+    \item implementing spatially varying or nonlinear diffusion and reaction terms,
+    \item coupling the model with blood flow (convection-diffusion),
+    \item and validating the results with real experimental or medical data.
+\end{itemize}
+
+Despite these simplifications, this project shows how partial differential equations can help us understand and predict the behavior of drug diffusion in tissues.
+The combination of mathematical analysis and numerical simulation gives useful tools to study biomedical problems.
 
 \begin{thebibliography}{9}
-\bibitem{crank} J. Crank, \textit{The Mathematics of Diffusion}, Oxford University Press, 1975.
-\bibitem{keener} J. Keener and J. Sneyd, \textit{Mathematical Physiology}, Springer, 1998.
-\bibitem{jackson} T. L. Jackson et al., “Mathematical models of drug transport in tumors,” \textit{Journal of Controlled Release}, 2009.
+\bibitem{pmc1} https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5763252/
+\bibitem{pmc2} https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7491225/
+\bibitem{sciencedirect} https://www.sciencedirect.com/
+\bibitem{springer} https://link.springer.com/
+\bibitem{pubmed} https://pubmed.ncbi.nlm.nih.gov/
+\bibitem{wikipedia} https://en.wikipedia.org/wiki/Diffusion
 \end{thebibliography}
 
 \end{document}
